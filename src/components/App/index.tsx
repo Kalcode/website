@@ -8,11 +8,11 @@ import { Page } from '../Page';
 
 let timeline: AnimeTimelineInstance;
 
-const timing = 1000;
+const timing = 500;
 // const hasPlayed = false;
 
 let lastPosition = 0;
-let isReversed = true;
+let isReversed = false;
 
 function useWindowSize() {
   const [size, setSize] = useState(window.innerWidth);
@@ -37,7 +37,7 @@ function App() {
   const windowSize = useWindowSize();
 
   useEffect(() => {
-    timeline = anime.timeline({ autoplay: false });
+    timeline = anime.timeline({ autoplay: false, easing: 'easeOutInSine' });
 
     const cardContainer = cardRef.current;
     const innerContainer = pageRef.current?.children[0];
@@ -47,22 +47,43 @@ function App() {
     timeline
       .add({
         targets: innerContainer,
-        scaleX: config.card.height / window.innerWidth,
-        scaleY: config.card.width / window.innerHeight,
+        scaleY: config.card.height / window.innerHeight,
+        scaleX: config.card.width / window.innerWidth,
         scaleZ: 1,
         duration: 2 * timing,
-        easing: 'linear',
+        // easing: 'linear',
       })
+
+      .add(
+        {
+          targets: outerContainer,
+          rotateZ: '-90deg',
+          scaleZ: 1,
+          duration: 2 * timing,
+          // easing: 'linear',
+        },
+        0,
+      )
+      .add(
+        {
+          targets: cardContainer,
+          rotateZ: ['180deg', '90deg'],
+          scaleZ: 1,
+          duration: 2 * timing,
+          // easing: 'linear',
+        },
+        0,
+      )
 
       // Starts together
       .add(
         {
           targets: outerContainer,
-          rotateZ: '-90deg',
-          rotateX: '180deg',
+          rotateZ: ['-90deg', '-180deg'],
+          rotateY: '180deg',
           scaleZ: 1,
           duration: 2 * timing,
-          easing: 'linear',
+          // easing: 'linear',
         },
         2 * timing,
       )
@@ -72,18 +93,17 @@ function App() {
           rotateZ: ['90deg', '0deg'],
           rotateY: ['180deg', '0deg'],
           scaleZ: 1,
-          duration: 2 * 1000,
-          easing: 'linear',
+          duration: 2 * timing,
+          // easing: 'linear',
         },
         2 * timing,
       );
 
     if (isReversed) {
-      console.log('test');
       timeline.reverse();
     }
 
-    timeline.seek(lastPosition || timeline.duration);
+    timeline.seek(lastPosition || (isReversed ? timeline.duration : 0));
 
     return () => {
       lastPosition = timeline.currentTime;
