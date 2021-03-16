@@ -1,0 +1,14 @@
+.wrapper {
+  @apply relative z-0 flex flex-col items-center justify-center h-full min-h-full origin-center;
+
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.container {
+  @apply min-w-full min-h-full overflow-auto origin-center bg-white border border-black;
+
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}

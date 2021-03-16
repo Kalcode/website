@@ -1,0 +1,8 @@
+.container {
+  @apply flex flex-col items-center justify-center font-sans text-lg font-thin origin-center w-card h-card bg-primary text-white-light;
+
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  
+  transform: rotateZ(90deg) rotateY(180deg);
+}

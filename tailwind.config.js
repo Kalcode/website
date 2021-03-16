@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const config = require('./src/config.json');
+
 module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: false, // or 'media' or 'class'
@@ -13,6 +16,14 @@ module.exports = {
       white: {
         light: '#F2F2F2',
         DEFAULT: '#FFF',
+      },
+    },
+    extend: {
+      height: {
+        card: config.card.height,
+      },
+      width: {
+        card: config.card.width,
       },
     },
   },
