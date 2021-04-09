@@ -12,7 +12,7 @@ function Component(_: any, ref: ForwardedRef<HTMLDivElement>) {
             alt="0"
             height="300px"
             width="460px"
-            src="http://www.fillmurray.com/460/300"
+            src="http://www.fillmurray.com/600/400"
           />
           <div>
             <p>
