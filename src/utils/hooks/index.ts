@@ -20,9 +20,7 @@ export function useWindowSize() {
 }
 
 export function useLocation() {
-  const [location, setLocation] = useState<
-    'Card_Route' | 'About_Route' | '404'
-  >(getLocation());
+  const [location, setLocation] = useState<Routes>(getLocation());
 
   useEffect(() => {
     function updateLocation() {

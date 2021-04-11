@@ -8,6 +8,8 @@ const timing = 350;
 export function createCardPageTransition(
   pageRef: RefObject<HTMLDivElement>,
   cardRef: RefObject<HTMLDivElement>,
+  reversed = false,
+  seek?: number,
 ) {
   const timeline = anime.timeline({ autoplay: false, easing: 'linear' });
 
@@ -65,6 +67,16 @@ export function createCardPageTransition(
       },
       2 * timing,
     );
+
+  if (reversed) {
+    timeline.reverse();
+    timeline.seek(timeline.duration);
+  }
+
+  if (seek !== undefined) {
+    console.log('seel', seek);
+    timeline.seek(seek);
+  }
 
   return timeline;
 }

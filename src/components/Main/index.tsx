@@ -1,6 +1,6 @@
 import { AnimeTimelineInstance } from 'animejs';
 import clamp from 'lodash/clamp';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, WheelEventHandler } from 'react';
 
 import { useWindowSize } from '../../utils';
 import { createCardPageTransition } from '../../utils/animations';
@@ -8,41 +8,55 @@ import { Card } from '../Card';
 import { Page } from '../Page';
 
 interface IProps {
-  currentRoute: 'Card_Route' | 'About_Route';
+  currentRoute: Routes;
 }
 
 let hasMounted = false;
 let timeline: AnimeTimelineInstance;
-let lastPosition = 0;
+let lastPosition: number | undefined = undefined;
 let isReversed = false;
-let currentSeek = 0;
+
+function changeLocation(url: string, title = 'About Card', state = {}) {
+  window.history.pushState(state, title, url);
+
+  const popStateEvent = new PopStateEvent('popstate', { state: state });
+  dispatchEvent(popStateEvent);
+}
 
 export default function Main({ currentRoute }: IProps) {
+  const initialRoute = useRef<Routes>(currentRoute).current;
   const cardRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   const windowSize = useWindowSize();
 
   useEffect(() => {
-    timeline = createCardPageTransition(pageRef, cardRef);
-
-    if (!hasMounted) {
-      isReversed = currentRoute === 'Card_Route';
-      lastPosition = 0;
+    if (hasMounted) {
+      return;
     }
 
-    if (isReversed) {
-      timeline.reverse();
-    }
+    isReversed = initialRoute === 'Card_Route';
 
-    timeline.seek(lastPosition || (isReversed ? timeline.duration : 0));
+    timeline = createCardPageTransition(
+      pageRef,
+      cardRef,
+      isReversed,
+      lastPosition,
+    );
 
     return () => {
       lastPosition = timeline.currentTime;
       isReversed = timeline.reversed;
-
-      timeline.restart();
     };
+  }, [windowSize, initialRoute]);
+
+  useEffect(() => {
+    if (!hasMounted) {
+      console.log('skip');
+      return;
+    }
+
+    console.log(windowSize);
   }, [windowSize]);
 
   useEffect(() => {
@@ -56,43 +70,40 @@ export default function Main({ currentRoute }: IProps) {
       (currentRoute === 'About_Route' && timeline.direction === 'normal')
     ) {
       timeline.reverse();
-      timeline.play();
     }
+
+    timeline.play();
   }, [currentRoute]);
+
+  const onWheelCallback = useCallback<WheelEventHandler<HTMLElement>>(
+    ({ deltaY }) => {
+      if (currentRoute === 'About_Route') {
+        return;
+      }
+
+      const addSubtract = deltaY < 0 ? -1 : 1;
+      const { duration, progress } = timeline;
+      const amount = 50;
+      let newProgress = (progress / 100) * duration + addSubtract * amount;
+      newProgress = clamp(newProgress, 0, timeline.duration);
+
+      if (timeline.progress < 80 && timeline.paused) {
+        changeLocation('/about');
+      } else if (timeline.paused) {
+        timeline.seek(newProgress);
+      }
+    },
+    [currentRoute],
+  );
 
   return (
     <main
       className="main"
       role="presentation"
-      onWheel={({ deltaY }) => {
-        currentSeek += (deltaY < 0 ? -1 : 1) * 50;
-
-        currentSeek = clamp(currentSeek, 0, timeline.duration);
-
-        if (currentSeek > 400 && timeline.paused) {
-          timeline.play();
-        } else if (timeline.paused) {
-          timeline.seek(currentSeek);
-        }
-      }}
+      onWheel={onWheelCallback}
       onClick={() => {
-        if (timeline.paused) {
-          if (timeline.completed) {
-            timeline.reverse();
-          }
-
-          timeline.play();
-        } else {
-          timeline.reverse();
-        }
-
         const url = window.location.pathname === '/about' ? '/' : '/about';
-
-        window.history.pushState({}, 'About Card', url);
-
-        const popStateEvent = new PopStateEvent('popstate', { state: {} });
-        dispatchEvent(popStateEvent);
-        timeline.complete = undefined;
+        changeLocation(url);
       }}
     >
       <Card ref={cardRef} />
