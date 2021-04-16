@@ -1,5 +1,7 @@
 import { ForwardedRef, forwardRef } from 'react';
 
+import config from '../../config.json';
+
 import { SocialIcons } from './SocialIcons';
 import styles from './styles.module.css';
 
@@ -16,14 +18,12 @@ function Component(_: any, ref: ForwardedRef<HTMLDivElement>) {
       >
         <div className="py-4 text-center">
           <h2 className="font-bold" style={{ fontSize: '1.35rem' }}>
-            David Clausen
+            {config.name}
           </h2>
-          <p className="opacity-80">Software Developer</p>
+          <p className="opacity-80">{config.title}</p>
         </div>
         <p>
-          <a href="mailto:davidclausen2051@gmail.com">
-            davidclausen2051@gmail.com
-          </a>
+          <a href="mailto:davidclausen2051@gmail.com">{config.email}</a>
         </p>
         <SocialIcons />
       </div>

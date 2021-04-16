@@ -56,7 +56,7 @@ export default function Main({ currentRoute }: IProps) {
       return;
     }
 
-    console.log(windowSize);
+    console.log('resized', windowSize);
   }, [windowSize]);
 
   useEffect(() => {

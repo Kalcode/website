@@ -1,6 +1,17 @@
 {
+  "email": "davidclausen2051@gmail.com",
+  "name": "David Clausen",
+  "title": "Software Developer",
+
+  "social": {
+    "linkedin": "https://www.linkedin.com/in/david-clausen-a06606116",
+    "twitter": "https://twitter.com/Kalcoder",
+    "github": "https://github.com/Kalcode"
+  },
+
   "card": {
     "width": 600,
     "height": 300
   }
+
 }
