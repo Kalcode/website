@@ -1,9 +1,10 @@
-import { AnimeTimelineInstance } from 'animejs';
+import anime, { AnimeTimelineInstance } from 'animejs';
 import clamp from 'lodash/clamp';
 import { useCallback, useEffect, useRef, WheelEventHandler } from 'react';
 
 import { useWindowSize } from '../../utils';
 import { createCardPageTransition } from '../../utils/animations';
+import { changeLocation } from '../../utils/routing';
 import { Card } from '../Card';
 import { Page } from '../Page';
 
@@ -16,26 +17,33 @@ let timeline: AnimeTimelineInstance;
 let lastPosition: number | undefined = undefined;
 let isReversed = false;
 
-function changeLocation(url: string, title = 'About Card', state = {}) {
-  window.history.pushState(state, title, url);
-
-  const popStateEvent = new PopStateEvent('popstate', { state: state });
-  dispatchEvent(popStateEvent);
-}
-
 export default function Main({ currentRoute }: IProps) {
   const initialRoute = useRef<Routes>(currentRoute).current;
+  const mainRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   const windowSize = useWindowSize();
 
+  // On Mount
   useEffect(() => {
     if (hasMounted) {
       return;
     }
 
     isReversed = initialRoute === 'Card_Route';
+
+    const intro = anime.timeline({ autoplay: false });
+
+    intro.add({
+      targets: [mainRef.current, cardRef.current],
+      opacity: [0, 1],
+      delay: anime.stagger(250),
+      duration: 1000 * 10,
+      translateY: [40, 0],
+    });
+
+    intro.play();
 
     timeline = createCardPageTransition(
       pageRef,
@@ -48,17 +56,36 @@ export default function Main({ currentRoute }: IProps) {
       lastPosition = timeline.currentTime;
       isReversed = timeline.reversed;
     };
-  }, [windowSize, initialRoute]);
+  }, [initialRoute]);
 
+  // Window Resizing
   useEffect(() => {
+    lastPosition = timeline.currentTime;
+    isReversed = timeline.reversed;
+    const progress = timeline.progress;
+
     if (!hasMounted) {
-      console.log('skip');
       return;
     }
 
-    console.log('resized', windowSize);
+    timeline.restart();
+    timeline.pause();
+
+    timeline = createCardPageTransition(
+      pageRef,
+      cardRef,
+      isReversed,
+      lastPosition,
+    );
+
+    timeline.pause();
+
+    if (progress !== 0 && progress !== 100) {
+      timeline.play();
+    }
   }, [windowSize]);
 
+  // Route change animation
   useEffect(() => {
     if (!hasMounted || !timeline) {
       hasMounted = true;
@@ -98,6 +125,7 @@ export default function Main({ currentRoute }: IProps) {
 
   return (
     <main
+      ref={mainRef}
       className="main"
       role="presentation"
       onWheel={onWheelCallback}

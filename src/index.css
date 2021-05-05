@@ -17,6 +17,10 @@ body {
   
 }
 
+#root {
+  overflow: hidden;
+}
+
 .main {
   background-image: url("./assets//background.png");
   background-position: center;

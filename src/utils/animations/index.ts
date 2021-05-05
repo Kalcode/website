@@ -20,17 +20,17 @@ export function createCardPageTransition(
 
   timeline
     .add({
-      targets: innerContainer,
-      scaleY: config.card.height / window.innerHeight,
-      scaleX: config.card.width / window.innerWidth,
-      scaleZ: 1,
       duration: 2 * timing,
+      scaleX: config.card.width / window.innerWidth,
+      scaleY: config.card.height / window.innerHeight,
+      scaleZ: 1,
+      targets: innerContainer,
     })
 
     .add(
       {
         targets: outerContainer,
-        rotateZ: '-90deg',
+        rotateZ: ['0deg', '-90deg'],
         scaleZ: 1,
         duration: 2 * timing,
       },
@@ -38,10 +38,11 @@ export function createCardPageTransition(
     )
     .add(
       {
-        targets: cardContainer,
+        duration: 2 * timing,
         rotateZ: ['180deg', '90deg'],
         scaleZ: 1,
-        duration: 2 * timing,
+        targets: cardContainer,
+        translateY: 0,
       },
       0,
     )
@@ -49,21 +50,22 @@ export function createCardPageTransition(
     // Starts together
     .add(
       {
-        targets: outerContainer,
-        rotateZ: ['-90deg', '-180deg'],
-        rotateY: '180deg',
-        scaleZ: 1,
         duration: 2 * timing,
+        rotateY: ['0deg', '180deg'],
+        rotateZ: ['-90deg', '-180deg'],
+        scaleZ: 1,
+        targets: outerContainer,
       },
       2 * timing,
     )
     .add(
       {
-        targets: cardContainer,
-        rotateZ: ['90deg', '0deg'],
-        rotateY: ['180deg', '0deg'],
-        scaleZ: 1,
         duration: 2 * timing,
+        rotateY: ['180deg', '0deg'],
+        rotateZ: ['90deg', '0deg'],
+        scaleZ: 1,
+        targets: cardContainer,
+        translateY: 0,
       },
       2 * timing,
     );
@@ -74,7 +76,6 @@ export function createCardPageTransition(
   }
 
   if (seek !== undefined) {
-    console.log('seel', seek);
     timeline.seek(seek);
   }
 
