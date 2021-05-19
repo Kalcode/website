@@ -102,21 +102,32 @@ export default function Main({ currentRoute }: IProps) {
     timeline.play();
   }, [currentRoute]);
 
+  // Event Handler
   const onWheelCallback = useCallback<WheelEventHandler<HTMLElement>>(
     ({ deltaY }) => {
       if (currentRoute === 'About_Route') {
         return;
       }
 
-      const addSubtract = deltaY < 0 ? -1 : 1;
+      const addSubtract = deltaY > 0 ? -1 : 1;
       const { duration, progress } = timeline;
       const amount = 50;
+
+      // When using the scroll wheel to trigger
+      // the animation it doesn't aniamte
+      // when doing the intro
+
       let newProgress = (progress / 100) * duration + addSubtract * amount;
+      console.log('newProgress', newProgress);
       newProgress = clamp(newProgress, 0, timeline.duration);
 
       if (timeline.progress < 80 && timeline.paused) {
         changeLocation('/about');
       } else if (timeline.paused) {
+        timeline.pause();
+        timeline.seek(newProgress);
+      } else {
+        console.log('seek');
         timeline.seek(newProgress);
       }
     },
