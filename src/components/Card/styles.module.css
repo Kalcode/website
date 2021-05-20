@@ -4,5 +4,5 @@
   -webkit-backface-visibility: hidden; /* Safari */
   backface-visibility: hidden;
   
-  transform: rotateZ(90deg) rotateY(180deg);
+  /* transform: rotateZ(90deg) rotateY(180deg); */
 }
